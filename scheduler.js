@@ -130,5 +130,5 @@ function loadTimezone() {
   }
 }
 
-module.exports = { scheduleMessages, addScheduledMessage };
+module.exports = { scheduleMessages, addScheduledMessage, reloadSchedule};
 

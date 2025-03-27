@@ -4,6 +4,7 @@ const fs = require("fs");
 const path = require("path");
 const { addScheduledMessage } = require("./scheduler");
 const { apiKey: PUBLIC_API_KEY } = require("./config");
+const { reloadSchedule } = require("./scheduler");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
