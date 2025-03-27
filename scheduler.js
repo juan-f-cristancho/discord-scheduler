@@ -6,8 +6,8 @@ const { sendDiscordMessage } = require("./discordSender");
 const messagesPath = path.join(__dirname, "messages.json");
 const settingsPath = path.join(__dirname, "settings.json");
 
-let scheduledJobs = []; // Array para guardar tareas activas
-let timezone = "UTC"; // Valor predeterminado
+let scheduledJobs = []; // Array para tareas programadas
+let timezone = "UTC"; // Por defecto
 
 // Mapa de días para cron (0=Domingo, 1=Lunes, ..., 6=Sábado)
 const dayMap = {
@@ -55,7 +55,7 @@ function scheduleOneMessage(entry) {
   const cronExpr = `${minute} ${hour} * * ${dayMap[day]}`;
 
   console.log(`⏰ Programando: ${message} → ${day} ${time} con zona: ${timezone}`);
-  
+
   try {
     const job = cron.schedule(
       cronExpr,
@@ -72,6 +72,15 @@ function scheduleOneMessage(entry) {
   } catch (err) {
     console.error(`❌ Error al programar: ${err.message}`);
   }
+}
+
+// ✅ Agregar un nuevo mensaje programado al archivo messages.json
+function addScheduledMessage(entry) {
+  const schedule = loadSchedule();
+  schedule.push(entry);
+  fs.writeFileSync(messagesPath, JSON.stringify(schedule, null, 2), "utf-8");
+  console.log(`📅 Nuevo mensaje agendado: "${entry.message}" para ${entry.day} a las ${entry.time}`);
+  scheduleOneMessage(entry); // Programar la tarea inmediatamente
 }
 
 // ✅ Cargar tareas desde messages.json
@@ -92,4 +101,4 @@ function scheduleMessages() {
 scheduleMessages();
 
 // ✅ Exportar funciones para usarlas en otros archivos
-module.exports = { scheduleMessages, reloadSchedule };
+module.exports = { scheduleMessages, addScheduledMessage, reloadSchedule };
