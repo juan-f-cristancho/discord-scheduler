@@ -40,6 +40,19 @@ const utcToTimezone = {
   "UTC+12": "Etc/GMT-12"
 };
 
+const validTimezones = [
+  "Etc/GMT+12", "Etc/GMT+11", "Etc/GMT+10", "Etc/GMT+9", "Etc/GMT+8", "Etc/GMT+7",
+  "Etc/GMT+6", "Etc/GMT+5", "Etc/GMT+4", "Etc/GMT+3", "Etc/GMT+2", "Etc/GMT+1",
+  "Etc/GMT", "Etc/GMT-1", "Etc/GMT-2", "Etc/GMT-3", "Etc/GMT-4", "Etc/GMT-5",
+  "Etc/GMT-6", "Etc/GMT-7", "Etc/GMT-8", "Etc/GMT-9", "Etc/GMT-10", "Etc/GMT-11",
+  "Etc/GMT-12", "UTC", "America/Argentina/Buenos_Aires", "America/New_York"
+];
+
+// Función para validar si la zona horaria es válida
+function isValidTimezone(tz) {
+  return validTimezones.includes(tz);
+}
+
 app.use(bodyParser.json());
 
 app.post("/schedule", (req, res) => {
