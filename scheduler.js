@@ -2,6 +2,18 @@ const cron = require("node-cron");
 const fs = require("fs");
 const path = require("path");
 const { sendDiscordMessage } = require("./discordSender");
+const settingsPath = path.join(__dirname, "settings.json");
+let timezone = "UTC";
+
+// Cargar zona horaria al iniciar
+if (fs.existsSync(settingsPath)) {
+  try {
+    const settings = JSON.parse(fs.readFileSync(settingsPath, "utf-8"));
+    timezone = settings.timezone || "UTC";
+  } catch (e) {
+    console.warn("⚠️ No se pudo leer settings.json, usando UTC");
+  }
+}
 
 const messagesPath = path.join(__dirname, "messages.json");
 const dayMap = {
@@ -44,6 +56,31 @@ function addScheduledMessage(entry) {
 function scheduleMessages() {
   const schedule = loadSchedule();
   schedule.forEach(scheduleOneMessage);
+}
+
+// Convertir hora local a UTC usando el offset
+function getUtcTime(hour, minute) {
+  let utcHour = parseInt(hour) - timezoneOffset;
+
+  if (utcHour < 0) utcHour += 24; // manejar horas negativas
+  if (utcHour >= 24) utcHour -= 24; // manejar horas mayores a 24
+
+  return { hour: utcHour, minute };
+}
+
+// Programar mensajes con la zona horaria configurada
+function scheduleOneMessage(entry) {
+  const { day, time, message, channelId } = entry;
+  const [hour, minute] = time.split(":");
+  const cronExpr = `${minute} ${hour} * * ${dayMap[day]}`;
+
+  cron.schedule(cronExpr, () => {
+    sendDiscordMessage(message, channelId);
+  }, {
+    timezone
+  });
+
+  console.log(`🕒 Programado: "${message}" → ${day} ${time} (${timezone}) en canal ${channelId}`);
 }
 
 module.exports = { scheduleMessages, addScheduledMessage };
