@@ -95,16 +95,18 @@ app.post("/timezone", (req, res) => {
     return res.status(401).json({ error: "API Key inválida" });
   }
 
-  if (!timezone || !utcToTimezone[timezone]) {
-    return res.status(400).json({ error: "Zona horaria inválida. Use formato UTC±X." });
+  if (!isValidTimezone(timezone)) {
+    return res.status(400).json({ error: "Zona horaria inválida. Use UTC±X o una zona válida." });
   }
 
-  const resolvedTimezone = utcToTimezone[timezone];
-  
-  const settings = { timezone: resolvedTimezone };
+  // Guardar la nueva zona horaria en settings.json
+  const settings = { timezone };
   fs.writeFileSync(settingsPath, JSON.stringify(settings, null, 2), "utf-8");
 
-  res.json({ success: true, message: `Zona horaria actualizada a ${resolvedTimezone} (${timezone})` });
+  // Recargar tareas con la nueva zona horaria
+  reloadSchedule();
+
+  res.json({ success: true, message: `Zona horaria actualizada a ${timezone}` });
 });
 
 app.get("/webhooks", (req, res) => {
