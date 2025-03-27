@@ -129,7 +129,18 @@ app.get("/timezone", (req, res) => {
     return res.status(401).json({ error: "API Key inválida" });
   }
 
-  res.json({ timezone: `UTC${timezoneOffset >= 0 ? "+" : ""}${timezoneOffset}` });
+  if (!fs.existsSync(settingsPath)) {
+    return res.json({ timezone: "UTC" });
+  }
+
+  try {
+    const settings = JSON.parse(fs.readFileSync(settingsPath, "utf-8"));
+    const timezone = settings.timezone || "UTC";
+    res.json({ timezone });
+  } catch (e) {
+    console.error("⚠️ Error al leer settings.json:", e.message);
+    res.status(500).json({ error: "No se pudo obtener la zona horaria" });
+  }
 });
 
 app.listen(PORT, () => {
