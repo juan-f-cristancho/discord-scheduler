@@ -10,8 +10,9 @@ if (fs.existsSync(settingsPath)) {
   try {
     const settings = JSON.parse(fs.readFileSync(settingsPath, "utf-8"));
     timezone = settings.timezone || "UTC";
+    console.log(`🕒 Zona horaria actual cargada: ${timezone}`);
   } catch (e) {
-    console.warn("⚠️ No se pudo leer settings.json, usando UTC");
+    console.warn("⚠️ No se pudo leer settings.json, usando UTC por defecto");
   }
 }
 
