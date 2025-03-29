@@ -5,7 +5,8 @@
   "scripts": {
  	"start": "node server/index.js",
  	"bot": "node -e \"console.log('Ejecutando bot desde: ' + __dirname + '/bot/index.js')\" && node bot/index.js"
-  },
+	"test-bot": "node test.js"  
+	},
   "keywords": [],
   "author": "",
   "license": "ISC",
